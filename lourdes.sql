@@ -51,6 +51,13 @@ JOIN tracks  ON genres.GenreId = tracks.GenreId
 GROUP BY genres.name ORDER BY Total_canciones DESC
 
 --Consulta 10--
+SELECT clie.FirstName AS Nombre_cliente, artists.name AS Nombre_artista FROM customers clie
+JOIN invoices ON clie.CustomerId = invoices.CustomerId
+JOIN invoice_items ON invoices.InvoiceId = invoice_items.InvoiceId
+JOIN tracks ON invoice_items.TrackId = tracks.TrackId
+JOIN albums ON tracks.AlbumId = albums.AlbumId
+JOIN artists ON albums.ArtistId = artists.ArtistId
+ORDER BY Nombre_cliente ASC
 
 
 
