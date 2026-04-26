@@ -47,7 +47,7 @@ JOIN invoices inv ON clie.CustomerId = inv.InvoiceId
 
 --Consulta 9--
 SELECT genres.name AS Genero, COUNT(tracks.TrackId) AS Total_canciones FROM genres 
-JOIN tracks  ON genres.GenreId = tracks.GenreId
+JOIN tracks ON genres.GenreId = tracks.GenreId
 GROUP BY genres.name ORDER BY Total_canciones DESC
 
 --Consulta 10--
@@ -59,6 +59,28 @@ JOIN albums ON tracks.AlbumId = albums.AlbumId
 JOIN artists ON albums.ArtistId = artists.ArtistId
 ORDER BY Nombre_cliente ASC
 
+--Consulta 11--
+SELECT clie.FirstName AS Nombre_cliente, 
+ clie.City AS Ciudad_cliente, tracks.Name AS Nombre_cancion,
+ genres.Name AS Genero_cancion  FROM customers clie
+JOIN invoices ON clie.CustomerId = invoices.CustomerId
+JOIN invoice_items ON invoices.InvoiceId = invoice_items.InvoiceId
+JOIN tracks ON invoice_items.TrackId = tracks.TrackId
+JOIN genres ON genres.GenreId = tracks.GenreId
+ORDER BY Nombre_cliente ASC;
+
+--Consulta 12--
+SELECT * FROM customers
+JOIN invoices ON customers.CustomerId = invoices.CustomerId
+JOIN invoice_items ON invoices.InvoiceId = invoice_items.InvoiceId
+JOIN tracks ON invoice_items.TrackId = tracks.TrackId
+JOIN genres ON tracks.GenreId = genres.GenreId
+JOIN media_types ON tracks.MediaTypeId = media_types.MediaTypeId
+JOIN albums ON tracks.AlbumId = albums.AlbumId
+JOIN artists ON albums.ArtistId = artists.ArtistId
+JOIN employees ON customers.SupportRepId = employees.EmployeeId
+JOIN playlist_track ON tracks.TrackId = playlist_track.TrackId
+JOIN playlists ON playlist_track.PlaylistId = playlists.PlaylistId;
 
 
 
