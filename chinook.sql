@@ -192,9 +192,10 @@ WHERE InvoiceDate >= '2010-01-01' AND InvoiceDate < '2011-01-01' )
 --Execution finished without errors.
 --Result: query executed successfully. Took 3ms, 455 rows affected
 
-
-
-
+-- At line 1:
+DELETE FROM invoices 
+WHERE InvoiceDate >= '2010-01-01' AND InvoiceDate < '2011-01-01'
+-- Result: query executed successfully. Took 1ms, 83 rows affected
 
 
  
