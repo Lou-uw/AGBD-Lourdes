@@ -91,6 +91,6 @@ plt.pie(
     wedgeprops={"edgecolor": "white"}
 )
 
-plt.title("Mayor tiempo de internacion por edad")
+plt.title("Mayor tiempo de internacion según género")
 plt.savefig("reporte_torta.png", dpi=300)
 plt.close()
