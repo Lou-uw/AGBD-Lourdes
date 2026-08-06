@@ -100,12 +100,10 @@ plt.close()
 #Reutilizar el filtro que tenemos y agregar una condicion más
 condicion_extra = df["patient_nbr"] > 8222157
 
-resultado = df.loc [filtro & condicion_extra, [
-    "gender","patient_nbr","race"
-]
-]
-print(resultado)
-print(f"\nFilas seleccionadas:{len(resultado)}")
+resultado_original = df.loc [filtro & condicion_extra, ["gender","patient_nbr","race"]]
+print(resultado_original)
+print(f"\nFilas seleccionadas:{len(resultado_original)}")
+
 
 #Lo que deben observar y anotar
 # ¿Cuántas filas quedaron después de aplicar el doble filtro?
@@ -168,5 +166,74 @@ print(df_rellenado["time_in_hospital"].head(10))
 # un diagnóstico no correcto de "Estado Normal" cuando en verdad correspondía 
 # una "Prioridad Alta".
 
+#Punto 11
+
+# Paso 1 y 2: agrupar y ordenar
+agrupado = df.groupby("gender")["time_in_hospital"].sum().sort_values()
+
+#Paso 3: grafico de lineas
+fig, ax = plt.subplots(figsize=(10,5))
+ax.plot(agrupado.index, agrupado.values, marker="o",
+        color="#2E75B6",linewidth=2,markersize=8)
+
+#Paso 4: detectar y anotar el maximo 
+idx_max = agrupado.idxmax()
+val_max = agrupado.max()
+
+ax.annotate(
+    f"Maximo: {val_max:,.0f}",
+    xy=(idx_max, val_max),
+    xytext=(1,val_max * 0.85),
+    arrowprops=dict(arrowstyle="->",color="red"),
+    fontsize=11, color="red", fontweight="bold"
+)
+#Paso 5: configuracion final
+ax.set_title("Evolucion por categoria",fontsize=14,fontweight="bold")
+ax.set_xlabel("Categoria")
+ax.set_ylabel("Total")
+plt.xticks(rotation=45,ha="right")
+plt.tight_layout()
+plt.savefig("grafico_lineas.png", dpi=150)
+plt.show()
+
+#Preguntas 11
+#¿La línea que generaron tiene un patrón claro (sube, baja, tiene picos)? ¿A qué lo atribuyen?
+#¿Tiene sentido usar un gráfico de líneas para sus datos o hubiera sido mejor otro tipo?
+#¿Qué pasa si usan agrupado.sort_index() en vez de sort_values()? ¿Cuál conviene?
+
+#Punto 12 -.query() - filtros como texto
+
+#1, 2 y 3
+minimo_paciente = 8222157
+resultado_query = df.query("patient_nbr > @minimo_paciente and gender == 'Female'" )
+
+#4 
+print("\n¿Son iguales?", resultado_original.equals(resultado_query))
+
+#5
+print("Con corchetes:")
+print(resultado_original)
+print("\nCon .query():")
+print(resultado_query)
+
+#Punto 13 - .isin() y ~ — incluir y excluir categorías
+
+# Incluir categorías seleccionadas
+categorias_elegidas = ['AfricanAmericna', 'Caucasian']   # sus valores reales
+df_incluidos = df[df['race'].isin(categorias_elegidas)]
+ 
+# Excluir esas mismas categorías
+df_excluidos = df[~df['race'].isin(categorias_elegidas)]
+ 
+print(f'Filas incluidas ({len(df_incluidos)}):')
+print(df_incluidos)
+print(f'\nFilas excluidas ({len(df_excluidos)}):')
+print(df_excluidos)
+ 
+# Verificar que suman el total
+total = len(df)
+suma  = len(df_incluidos) + len(df_excluidos)
+print(f'\nTotal original: {total}  |  Incluidos + Excluidos: {suma}')
+print(f'¿Coinciden? {total == suma}')
 
 
