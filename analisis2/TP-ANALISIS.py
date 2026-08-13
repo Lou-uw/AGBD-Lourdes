@@ -100,6 +100,8 @@ plt.close()
 #Reutilizar el filtro que tenemos y agregar una condicion más
 condicion_extra = df["patient_nbr"] > 8222157
 
+filtro_avanzado = filtro & condicion_extra 
+
 resultado_original = df.loc [filtro & condicion_extra, ["gender","patient_nbr","race"]]
 print(resultado_original)
 print(f"\nFilas seleccionadas:{len(resultado_original)}")
@@ -196,25 +198,37 @@ plt.tight_layout()
 plt.savefig("grafico_lineas.png", dpi=150)
 plt.show()
 
-#Preguntas 11
+#Preguntas punto 11
 #¿La línea que generaron tiene un patrón claro (sube, baja, tiene picos)? ¿A qué lo atribuyen?
 #¿Tiene sentido usar un gráfico de líneas para sus datos o hubiera sido mejor otro tipo?
 #¿Qué pasa si usan agrupado.sort_index() en vez de sort_values()? ¿Cuál conviene?
 
-#Punto 12 -.query() - filtros como texto
+# Punto 12 - .query() - filtros como texto
 
-#1, 2 y 3
 minimo_paciente = 8222157
-resultado_query = df.query("patient_nbr > @minimo_paciente and gender == 'Female'" )
 
-#4 
-print("\n¿Son iguales?", resultado_original.equals(resultado_query))
+# Filtro original
+resultado_original = df.loc[
+    filtro & condicion_extra,
+    ["gender", "patient_nbr", "race"]
+]
 
-#5
+# Mismo filtro usando .query()
+resultado_query = df.query(
+    "patient_nbr > @minimo_paciente and gender == 'Female'"
+)[["gender", "patient_nbr", "race"]]
+
 print("Con corchetes:")
 print(resultado_original)
+
 print("\nCon .query():")
 print(resultado_query)
+
+print("\n¿Son iguales?", resultado_original.equals(resultado_query))
+#Preguntas punto 12
+#¿El resultado de .query() es idéntico al de su filtro_avanzado? ¿Por qué?
+#¿Cuál de las dos formas les parece más clara para leer?
+#¿Qué ventaja tiene usar @ en lugar de escribir el valor directamente en el texto?
 
 #Punto 13 - .isin() y ~ — incluir y excluir categorías
 
@@ -236,4 +250,123 @@ suma  = len(df_incluidos) + len(df_excluidos)
 print(f'\nTotal original: {total}  |  Incluidos + Excluidos: {suma}')
 print(f'¿Coinciden? {total == suma}')
 
+#Para pensar y responder en la entrega:
+#¿La suma de filas incluidas + excluidas da exactamente el total? ¿Por qué siempre debería ser así?
+#¿Qué ventaja tiene .isin(['A','B','C']) frente a escribir == 'A' | == 'B' | == 'C'?
+#¿Cuándo usarían la versión con ~ en un análisis real?
 
+
+
+#Punto 14 — .value_counts(), .unique() y .nunique()
+
+# Sobre el DataFrame COMPLETO
+print("\n=== DataFrame completo ===")
+
+print("Conteo por categoría:")
+print(df["gender"].value_counts())
+
+print("Valores únicos:")
+print(df["gender"].unique())
+
+print("Cantidad de categorías:")
+print(df["gender"].nunique())
+
+print("Porcentajes:")
+print((df["gender"].value_counts(normalize=True) * 100).round(1))
+
+# Sobre el DataFrame FILTRADO
+print("\n=== DataFrame filtrado ===")
+
+df_filtrado = df[filtro_avanzado]
+
+# Cuántas veces aparece cada categoría
+print("Conteo por categoría:")
+print(df_filtrado["gender"].value_counts())
+
+# Qué valores únicos hay
+print('\n Valores unicos:', df_filtrado["gender"].unique())
+
+# Cuántos valores únicos hay (solo el número)
+print('\n Cantidad de valores únicos:', df_filtrado["gender"].nunique())
+
+# En porcentaje
+print("\n Porcentaje:")
+print((df_filtrado["gender"].value_counts(normalize=True) * 100).round(1))
+
+#Preguntas punto 14
+
+# ¿Cambia la distribución de categorías entre el DataFrame completo y el filtrado? ¿Qué dice eso?
+#Si cambia porque con el dataframe filtrado al tener condiciones solo se toma una parte de este y 
+# las demas se descartan, por lo que las cantidades y porcentajes de las categorias pueden cambiar.
+
+# ¿Hay alguna categoría que desapareció completamente al aplicar el filtro?
+#Hay dos, las de Male y Unknown/Invalid
+
+
+# ¿value_counts() y groupby().count() dan el mismo resultado? ¿Cuándo usarían cada uno?
+#value_counts() sirve para contar directamente cuántas veces 
+#aparece cada categoría de una columna. groupby().count()también
+#puede contar registros agrupándolos por una categoría,pero
+#groupby() permite realizar análisis más complejos, como sumar o
+#calcular promedios dentro de cada grupo. Por eso, para contar
+#categorías usaría value_counts(), mientras que para hacer otros
+#cálculos por grupo usaría groupby().
+
+
+#Punto 15 — Exportar a CSV + Heatmap de correlación
+
+import numpy as np
+
+# Paso 1: exportar el DataFrame filtrado
+df_filtrado = df[filtro_avanzado]
+df_filtrado.to_csv("resultado_filtrado.csv", index=False)
+
+print(f"Archivo exportado: {len(df_filtrado)} filas guardadas.")
+
+# Paso 2: calcular la correlación del DataFrame COMPLETO
+correlacion = df.corr(numeric_only=True)
+
+print("\nMatriz de correlación:")
+print(correlacion.round(2))
+
+# Paso 3 y 4: crear y guardar el heatmap
+plt.figure(figsize=(8, 6))
+sns.heatmap(
+    correlacion,
+    annot=True,
+    fmt=".2f",
+    cmap="YlGnBu",
+    linewidths=0.5,
+    vmin=-1,
+    vmax=1
+)
+plt.title(
+    "Correlación entre variables - Mi Dataset",
+    fontweight="bold"
+)
+plt.tight_layout()
+plt.savefig("heatmap_mi_dataset.png", dpi=150)
+plt.show()
+
+
+# Paso 5: identificar el par más y menos correlacionado
+mask = np.triu(
+    np.ones(correlacion.shape),
+    k=0
+).astype(bool)
+
+correlacion_sin_diag = correlacion.where(~mask)
+
+par_max = correlacion_sin_diag.stack().idxmax()
+par_min = correlacion_sin_diag.stack().idxmin()
+
+print(f"\nPar más correlacionado: {par_max[0]} ↔ {par_max[1]}")
+print(f"Par menos correlacionado: {par_min[0]} ↔ {par_min[1]}")
+
+#Preguntas
+
+#¿Qué par de columnas tiene la correlación más alta? ¿Tiene sentido con sus datos?
+
+#¿Qué significa una correlación cercana a 1? ¿Y cercana a 0? ¿Y negativa?
+
+#¿Por qué usamos el DataFrame completo para calcular la correlación y no el filtrado?
