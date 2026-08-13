@@ -231,7 +231,7 @@ print("\n¿Son iguales?", resultado_original.equals(resultado_query))
 #¿Qué ventaja tiene usar @ en lugar de escribir el valor directamente en el texto?
 
 #Punto 13 - .isin() y ~ — incluir y excluir categorías
-
+print("PUNTO 13")
 # Incluir categorías seleccionadas
 categorias_elegidas = ['AfricanAmericna', 'Caucasian']   # sus valores reales
 df_incluidos = df[df['race'].isin(categorias_elegidas)]
@@ -250,8 +250,10 @@ suma  = len(df_incluidos) + len(df_excluidos)
 print(f'\nTotal original: {total}  |  Incluidos + Excluidos: {suma}')
 print(f'¿Coinciden? {total == suma}')
 
-#Para pensar y responder en la entrega:
+#Preguntas punto 13 
+
 #¿La suma de filas incluidas + excluidas da exactamente el total? ¿Por qué siempre debería ser así?
+
 #¿Qué ventaja tiene .isin(['A','B','C']) frente a escribir == 'A' | == 'B' | == 'C'?
 #¿Cuándo usarían la versión con ~ en un análisis real?
 
