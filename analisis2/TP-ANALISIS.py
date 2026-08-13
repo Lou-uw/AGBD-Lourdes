@@ -363,10 +363,21 @@ par_min = correlacion_sin_diag.stack().idxmin()
 print(f"\nPar más correlacionado: {par_max[0]} ↔ {par_max[1]}")
 print(f"Par menos correlacionado: {par_min[0]} ↔ {par_min[1]}")
 
-#Preguntas
+#Preguntas punto 15
 
 #¿Qué par de columnas tiene la correlación más alta? ¿Tiene sentido con sus datos?
+#En nuestro dataset, el par de columnas con la correlación matemática más alta es encounter_id 
+#y patient_nbr (0.51), aunque esto no tiene sentido clínico y solo responde al orden en que se 
+#registraron los datos. Excluyendo los IDs, el par con mayor correlación es time_in_hospital 
+#y num_medications (0.47), lo cual tiene un sentido médico, a más días de internación, mayor
+#tiende a ser la cantidad de medicamentos administrados.
 
 #¿Qué significa una correlación cercana a 1? ¿Y cercana a 0? ¿Y negativa?
+#En cuanto a los valores, una correlación cercana a 1 indica que si una variable aumenta, la otra
+#también lo hace (relación directa), cercana a 0 significa que no existe relación entre ellas y 
+#negativa indica que si una sube, la otra baja (relación inversa).
 
 #¿Por qué usamos el DataFrame completo para calcular la correlación y no el filtrado?
+#Usamos el DataFrame completo en lugar de uno filtrado para tener una visión general de todos 
+#los datos desde el principio y evitar sesgos o conclusiones falsas que podrían surgir al 
+#recortar la muestra antes de tiempo.
