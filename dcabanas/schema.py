@@ -9,7 +9,7 @@ class Base(DeclarativeBase):
 class Categorias(Base):
     __tablename__ = "categorias"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    nombre = Column(String(50), nullable=False)      # Pizzas Clásicas, Especiales, Dulces, Papas, Bebidas, Bordes
+    nombre = Column(String(50), nullable=False)   # Pizzas Clásicas, Pizzas Especiales, Papas Fritas, Gaseosas, Adicionales
 
     productos = relationship("Productos", back_populates="categoria")
 
@@ -17,9 +17,11 @@ class Categorias(Base):
 class Tamanios(Base):
     __tablename__ = "tamanios"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    nombre = Column(String(30), nullable=False)      # Chica, Mediana, Grande, Familiar
+    nombre = Column(String(30), nullable=False)   # Mediana, Grande, Familiar
     porciones = Column(Integer)
-    factor_precio = Column(Float, nullable=False, default=1.0)   # Mediana = 1.0
+    precio_clasica = Column(Float, nullable=False)
+    precio_especial = Column(Float, nullable=False)
+    precio_borde = Column(Float, nullable=False)
 
 
 class Productos(Base):
@@ -28,7 +30,7 @@ class Productos(Base):
     nombre = Column(String(100), nullable=False)
     descripcion = Column(Text)
     categoria_id = Column(Integer, ForeignKey("categorias.id"), nullable=False)
-    precio = Column(Float, nullable=False)           # precio del tamaño Mediana
+    precio = Column(Float)                        # vacío en pizzas (el precio sale del tamaño)
     stock = Column(Integer)
     activo = Column(Boolean, default=True)
 
@@ -54,15 +56,14 @@ class DetallePedido(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     pedido_id = Column(Integer, ForeignKey("pedidos.id"))
     producto_id = Column(Integer, ForeignKey("productos.id"))
-    tamanio_id = Column(Integer, ForeignKey("tamanios.id"))   # vacío en papas, bebidas y bordes
-    borde_id = Column(Integer, ForeignKey("productos.id"))    # vacío si no pidió borde
+    tamanio_id = Column(Integer, ForeignKey("tamanios.id"))   # vacío en papas, gaseosas y adicionales
+    con_borde = Column(Boolean, default=False)                # solo pizzas
     cantidad = Column(Integer)
     precio_unitario = Column(Float)
     precio_borde = Column(Float, default=0)
 
     pedido = relationship("Pedidos", back_populates="detalles")
-    producto = relationship("Productos", foreign_keys=[producto_id])
-    borde = relationship("Productos", foreign_keys=[borde_id])
+    producto = relationship("Productos")
     tamanio = relationship("Tamanios")
 
 
