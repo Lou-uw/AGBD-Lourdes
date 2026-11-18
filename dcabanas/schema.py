@@ -47,6 +47,7 @@ class Pedidos(Base):
     cliente_nombre = Column(String(100))
     cliente_telefono = Column(String(50))
     direccion_entrega = Column(String(300))
+    notas = Column(String(300))
 
     detalles = relationship("DetallePedido", back_populates="pedido", cascade="all, delete-orphan")
 
@@ -61,6 +62,7 @@ class DetallePedido(Base):
     cantidad = Column(Integer)
     precio_unitario = Column(Float)
     precio_borde = Column(Float, default=0)
+    es_regalo = Column(Boolean, default=False)
 
     pedido = relationship("Pedidos", back_populates="detalles")
     producto = relationship("Productos")
